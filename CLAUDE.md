@@ -31,9 +31,12 @@ ESPRESSO) on an HPC cluster. Full proposal + timeline in `references/*.pdf`.
 - **Topology predictor = DGL-free spillage regressor**, trained on JARVIS
   spillage labels (matgl or MACE-MP) in the research phase. ALIGNN was dropped:
   it needs DGL, which has no modern torch/Python builds.
-- **DVC** for data/RL-checkpoint versioning; **local `.dvcstore` remote** for
-  now (swap to S3 later). Pretrained reward/generator weights re-fetch from
-  their package+handle, so they are NOT DVC-tracked.
+- **DVC** for data/RL-checkpoint versioning; default remote is
+  **s3://synth-q-mat-artifacts/dvc** (single-purpose IAM key scoped to that
+  bucket; per-machine credentials in gitignored `.dvc/config.local`, AWS keys
+  also in `.env` for the aws CLI). `.dvcstore` kept as `local-fallback` remote.
+  Pretrained reward/generator weights re-fetch from their package+handle, so
+  they are NOT DVC-tracked.
 - **MLflow** (self-hosted) for experiment tracking; runs link to git commits.
 - **MIT** license.
 - Viz: matplotlib/seaborn for publication, plotly for interactive.

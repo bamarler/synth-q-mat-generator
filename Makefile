@@ -28,10 +28,13 @@ CROSSMARK := [NO]
 # Project settings
 PROJECT_NAME  := synth-q-mat-generator
 PYTHON_VER    := 3.13
-# Local DVC remote until an S3 bucket exists. To move to S3 later (after
-# creating a bucket + filling AWS keys in .env):
-#   uv run dvc remote add -d -f storage s3://<bucket>/dvc
-DVC_REMOTE    := .dvcstore
+# Default DVC remote: S3 (single-purpose IAM key scoped to this bucket).
+# Credentials live in .dvc/config.local (gitignored) — on a new machine run:
+#   uv run dvc remote modify --local storage access_key_id <key>
+#   uv run dvc remote modify --local storage secret_access_key <secret>
+# A local fallback remote 'local-fallback' (.dvcstore) also exists:
+#   uv run dvc push -r local-fallback
+DVC_REMOTE    := s3://synth-q-mat-artifacts/dvc
 UV_CACHE_DIR  ?= .uv-cache
 UV_RUN        = UV_CACHE_DIR=$(UV_CACHE_DIR) uv run
 MATTERGEN_VENV := .venv-mattergen
@@ -72,10 +75,12 @@ setup: ## One-time setup: sync deps, init DVC, configure local remote
 	@if [ ! -d .dvc ]; then \
 		$(UV_RUN) dvc init; \
 		$(UV_RUN) dvc remote add -d storage $(DVC_REMOTE); \
-		printf "  $(GREEN)$(CHECKMARK)$(NC) DVC initialized with local remote $(DVC_REMOTE)\n"; \
-		printf "  $(YELLOW)[NOTE]$(NC)  Local remote for now; swap to S3 later (see Makefile DVC_REMOTE comment)\n"; \
+		printf "  $(GREEN)$(CHECKMARK)$(NC) DVC initialized with remote $(DVC_REMOTE)\n"; \
 	else \
 		printf "  $(GREEN)$(CHECKMARK)$(NC) DVC already initialized\n"; \
+	fi
+	@if [ ! -f .dvc/config.local ]; then \
+		printf "  $(YELLOW)[ACTION]$(NC) S3 credentials not set on this machine — see DVC_REMOTE comment above 'setup'\n"; \
 	fi
 	@if [ ! -f .env ]; then cp .env.example .env; \
 		printf "  $(YELLOW)[ACTION]$(NC) Created .env from template - add your MP_API_KEY\n"; fi

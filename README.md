@@ -29,7 +29,7 @@ then promising candidates are validated with DFT (VASP) and phonon calculations
 | Generator | MatterGen — isolated env (`scripts/setup_mattergen.sh`) |
 | Topology predictor | spillage regressor trained on JARVIS (matgl/MACE; DGL-free) |
 | Experiment tracking | MLflow (self-hosted) |
-| Data / model versioning | DVC (local remote now; S3 later) |
+| Data / model versioning | DVC → S3 (`synth-q-mat-artifacts`) |
 | Visualization | matplotlib + seaborn (publication), plotly (interactive) |
 | Lint / format | Ruff |
 | License | MIT |
@@ -72,8 +72,16 @@ stacks, so each model is provisioned where it can actually run:
 This project runs across a local Linux+NVIDIA workstation, the professor's HPC
 cluster, and possibly CPU-only machines. **Code** travels via git; **data and
 RL checkpoints** travel via DVC so any machine restores identical state. The DVC
-remote is a local directory (`.dvcstore`) for now; swap to S3 later (see the
-`DVC_REMOTE` comment in the Makefile).
+remote is `s3://synth-q-mat-artifacts/dvc` (a single-purpose IAM key scoped to
+just that bucket). Per machine, set the credentials once:
+
+```bash
+uv run dvc remote modify --local storage access_key_id <key>
+uv run dvc remote modify --local storage secret_access_key <secret>
+```
+
+These land in `.dvc/config.local`, which is gitignored. A `local-fallback`
+remote (`.dvcstore/`) exists for offline work: `dvc push -r local-fallback`.
 
 ```bash
 # On any machine:

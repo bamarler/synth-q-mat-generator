@@ -12,9 +12,15 @@ venv/
 .pytest_cache/
 
 # Data & models (DVC-managed; keep the .dvc pointer files, ignore the contents)
-/data/
-/models/
-/results/
+/data/**
+!/data/**/
+!/data/**/*.dvc
+/models/**
+!/models/**/
+!/models/**/*.dvc
+/results/**
+!/results/**/
+!/results/**/*.dvc
 
 # DVC cache / internals
 .dvc/cache/
