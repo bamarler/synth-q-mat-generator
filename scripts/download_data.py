@@ -11,13 +11,13 @@ versioned with `dvc add data/raw && make push`.
 
 Usage:
     make download-data ARGS="--source jarvis"
-    make download-data ARGS="--source mp --elements Li,Si,O --stable-only"
+    make download-data ARGS="--source mp"
+    make download-data ARGS="--source mp --refresh"   # force re-fetch from the API
 """
 
 from __future__ import annotations
 
 import argparse
-import json
 import os
 from pathlib import Path
 
@@ -26,7 +26,7 @@ from synth_q_mat.config import load_config
 
 RAW_DIR = Path("data/raw")
 
-# Default Materials Project field set — small, structure-bearing summary docs.
+# Columns kept in the parquet snapshot (the mp-api cache holds every field).
 MP_FIELDS = [
     "material_id",
     "formula_pretty",
@@ -38,6 +38,14 @@ MP_FIELDS = [
     "symmetry",
     "nelements",
 ]
+
+# Where mp-api stores its DeltaTable-backed dataset cache.
+MP_DATASET_DIR = (
+    Path(os.getenv("MP_DATASET_CACHE", Path.home() / "mp_datasets"))
+    / "build"
+    / "collections"
+    / "summary"
+)
 
 
 def _spillage_value(record: dict) -> float:
@@ -65,39 +73,57 @@ def download_jarvis(dataset: str = "dft_3d") -> None:
 
 
 def download_mp(
-    elements: list[str] | None,
     stable_only: bool,
     max_results: int | None,
+    refresh: bool,
 ) -> None:
-    """Query Materials Project summary docs; save raw to data/raw/mp_summary.json."""
-    api_key = os.getenv("MP_API_KEY")
-    if not api_key:
-        print("[mp] ERROR: MP_API_KEY not set. Add it to .env (see .env.example).")
-        return
+    """Snapshot the Materials Project summary to data/raw/mp_summary.parquet.
 
-    from monty.json import jsanitize
-    from mp_api.client import MPRester
+    mp-api streams the whole summary collection into a local DeltaTable cache
+    (~/mp_datasets, ~340 MB). We convert that cache directly with pyarrow —
+    iterating the returned docs one-by-one is orders of magnitude slower (it
+    pins a CPU for ages re-serializing 163k pydantic models to JSON).
+    """
+    if refresh or not MP_DATASET_DIR.exists():
+        api_key = os.getenv("MP_API_KEY")
+        if not api_key:
+            print("[mp] ERROR: MP_API_KEY not set. Add it to .env (see .env.example).")
+            return
+        from mp_api.client import MPRester
 
-    query: dict = {"fields": MP_FIELDS}
-    if elements:
-        query["elements"] = elements
+        print(
+            f"[mp] fetching summary collection (DeltaTable cache: {MP_DATASET_DIR})..."
+        )
+        with MPRester(api_key) as mpr:
+            mpr.materials.summary.search()  # populates the local cache
+    else:
+        print(
+            f"[mp] reusing cached DeltaTable at {MP_DATASET_DIR} (--refresh to re-fetch)"
+        )
+
+    import pyarrow.compute as pc
+    import pyarrow.parquet as pq
+    from deltalake import DeltaTable
+
+    table = DeltaTable(str(MP_DATASET_DIR)).to_pyarrow_table()
+    n_total = table.num_rows
+    cols = [c for c in MP_FIELDS if c in table.column_names]
+    missing = set(MP_FIELDS) - set(cols)
+    if missing:
+        print(f"[mp] WARNING: columns missing from cache, skipped: {sorted(missing)}")
+    table = table.select(cols)
     if stable_only:
-        query["is_stable"] = True
-
-    scope = {k: v for k, v in query.items() if k != "fields"}
-    print(f"[mp] querying summary.search({scope})...")
-    with MPRester(api_key) as mpr:
-        docs = mpr.materials.summary.search(**query)
+        table = table.filter(pc.field("is_stable"))
     if max_results:
-        docs = docs[:max_results]
-    print(f"[mp] retrieved {len(docs)} documents")
+        table = table.slice(0, max_results)
 
     RAW_DIR.mkdir(parents=True, exist_ok=True)
-    out = RAW_DIR / "mp_summary.json"
-    payload = jsanitize([d.model_dump() for d in docs], strict=True)
-    with open(out, "w") as fh:
-        json.dump(payload, fh)
-    print(f"[mp] saved {out} ({out.stat().st_size / 1e6:.1f} MB)")
+    out = RAW_DIR / "mp_summary.parquet"
+    pq.write_table(table, out)
+    print(
+        f"[mp] saved {out}: {table.num_rows}/{n_total} rows, "
+        f"{len(cols)} columns, {out.stat().st_size / 1e6:.1f} MB"
+    )
 
 
 def write_tqc_note() -> None:
@@ -126,21 +152,20 @@ def main() -> int:
         help="which source to download",
     )
     parser.add_argument(
-        "--elements",
-        type=lambda s: [e.strip() for e in s.split(",") if e.strip()],
-        default=None,
-        help="Materials Project: comma-separated elements that must be present",
-    )
-    parser.add_argument(
         "--stable-only",
         action="store_true",
-        help="Materials Project: restrict to is_stable=True",
+        help="Materials Project: keep only is_stable=True rows in the parquet",
     )
     parser.add_argument(
         "--max-results",
         type=int,
         default=None,
-        help="Materials Project: cap number of saved documents (for testing)",
+        help="Materials Project: cap number of saved rows (for testing)",
+    )
+    parser.add_argument(
+        "--refresh",
+        action="store_true",
+        help="Materials Project: re-fetch from the API even if a local cache exists",
     )
     args = parser.parse_args()
 
@@ -154,7 +179,7 @@ def main() -> int:
     if args.source in ("jarvis", "all"):
         download_jarvis("dft_3d")
     if args.source in ("mp", "all"):
-        download_mp(args.elements, args.stable_only, args.max_results)
+        download_mp(args.stable_only, args.max_results, args.refresh)
     if args.source in ("tqc", "all"):
         write_tqc_note()
 
