@@ -1,0 +1,70 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.venv/
+venv/
+.venv-mattergen/
+.venv-mattergen-src/
+.uv-cache/
+.ruff_cache/
+.pytest_cache/
+
+# Data & models (DVC-managed; keep the .dvc pointer files, ignore the contents)
+/data/**
+!/data/**/
+!/data/**/*.dvc
+/models/**
+!/models/**/
+!/models/**/*.dvc
+/results/**
+!/results/**/
+!/results/**/*.dvc
+
+# DVC cache / internals
+.dvc/cache/
+.dvc/tmp/
+.dvc/config.local
+
+# Experiment tracking
+mlruns/
+mlartifacts/
+mlflow.db
+
+# DVC local remote (artifact store; not a code artifact)
+.dvcstore/
+
+# Notebooks
+.ipynb_checkpoints/
+
+# VASP / DFT outputs
+OUTCAR*
+WAVECAR*
+CHGCAR*
+CHG
+EIGENVAL
+DOSCAR
+PROCAR
+vasprun.xml
+*.bandstructure
+
+# Quantum ESPRESSO scratch
+*.save/
+*.wfc*
+
+# SLURM logs
+slurm-*.out
+*.err
+
+# Secrets / credentials
+.env
+aws_credentials
+*.pem
+
+# OS / IDE
+.DS_Store
+.idea/
+.vscode/
+*.swp

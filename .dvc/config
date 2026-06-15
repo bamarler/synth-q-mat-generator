@@ -1,0 +1,7 @@
+[core]
+    remote = storage
+['remote "local-fallback"']
+    url = ../.dvcstore
+['remote "storage"']
+    url = s3://synth-q-mat-artifacts/dvc
+    region = us-east-1
