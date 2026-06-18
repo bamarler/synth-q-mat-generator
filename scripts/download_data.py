@@ -1,20 +1,3 @@
-"""Download source databases into data/raw/ (raw dumps only — no filtering).
-
-Sources:
-    - JARVIS-DFT (dft_3d): topological labels via spin-orbit `spillage`.
-    - Materials Project: structures + formation energy / stability via mp-api.
-    - Topological Quantum Chemistry (TQC): no programmatic API -> manual note.
-
-Parsing, light-element filtering, and conversion to a clean dataset happen in a
-later (research) phase. Here we just fetch and stage the raw data, then it gets
-versioned with `dvc add data/raw && make push`.
-
-Usage:
-    make download-data ARGS="--source jarvis"
-    make download-data ARGS="--source mp"
-    make download-data ARGS="--source mp --refresh"   # force re-fetch from the API
-"""
-
 from __future__ import annotations
 
 import argparse
@@ -77,13 +60,7 @@ def download_mp(
     max_results: int | None,
     refresh: bool,
 ) -> None:
-    """Snapshot the Materials Project summary to data/raw/mp_summary.parquet.
-
-    mp-api streams the whole summary collection into a local DeltaTable cache
-    (~/mp_datasets, ~340 MB). We convert that cache directly with pyarrow —
-    iterating the returned docs one-by-one is orders of magnitude slower (it
-    pins a CPU for ages re-serializing 163k pydantic models to JSON).
-    """
+    """Snapshot the Materials Project summary to data/raw/mp_summary.parquet."""
     if refresh or not MP_DATASET_DIR.exists():
         api_key = os.getenv("MP_API_KEY")
         if not api_key:
@@ -105,6 +82,8 @@ def download_mp(
     import pyarrow.parquet as pq
     from deltalake import DeltaTable
 
+    # Convert the DeltaTable cache directly; iterating mp-api's 163k pydantic
+    # docs one-by-one is orders of magnitude slower.
     table = DeltaTable(str(MP_DATASET_DIR)).to_pyarrow_table()
     n_total = table.num_rows
     cols = [c for c in MP_FIELDS if c in table.column_names]
@@ -144,7 +123,9 @@ def write_tqc_note() -> None:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
+    parser = argparse.ArgumentParser(
+        description="Download source databases (JARVIS, Materials Project, TQC) into data/raw/."
+    )
     parser.add_argument(
         "--source",
         choices=["jarvis", "mp", "tqc", "all"],

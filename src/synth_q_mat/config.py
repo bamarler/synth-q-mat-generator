@@ -1,14 +1,3 @@
-"""Lightweight config loading with dotted-key command-line overrides.
-
-This is intentionally small so the scaffold runs on day one without full Hydra
-wiring. The override syntax matches Hydra's (``a.b.c=value``), so migrating the
-entrypoints to ``@hydra.main`` later is a drop-in change.
-
-    from synth_q_mat.config import load_config
-    cfg = load_config(overrides=sys.argv[1:])
-    cfg["reward"]["w_topology"]
-"""
-
 from __future__ import annotations
 
 import ast

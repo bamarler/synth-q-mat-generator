@@ -1,5 +1,3 @@
-"""Evaluate and rank generated candidates; extract the Pareto front (weeks 5, 9)."""
-
 from __future__ import annotations
 
 import sys

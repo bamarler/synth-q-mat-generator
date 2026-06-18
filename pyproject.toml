@@ -54,9 +54,9 @@ build-backend = "hatchling.build"
 [tool.hatch.build.targets.wheel]
 packages = ["src/synth_q_mat"]
 
-# ALIGNN (topology predictor) and DiffCSP (crystal generator) are NOT on PyPI in a
-# form compatible with this stack. They are installed/fetched by
-# scripts/download_models.py. See README "Pretrained models" for details.
+# The crystal generator (MatterGen) needs an isolated env — it is set up by
+# scripts/setup_mattergen.sh, not installed here. The topology (spillage)
+# regressor is trained in the research phase (matgl/MACE). See README.
 
 [tool.uv.sources]
 torch = [

@@ -1,17 +1,3 @@
-"""Multi-objective reward for generated crystal structures.
-
-The reward linearly combines four normalized objectives, each in [0, 1]:
-
-    topology     P(topological) from ALIGNN
-    dos_fermi     density of states at the Fermi level, normalized -> [0, 1]
-    formation     stability score derived from formation energy above hull
-    composition   light-element preference, fraction of atoms within [min_z, max_z]
-
-Weights come from ``cfg["reward"]`` and are tuned against the Pareto front
-during weeks 4-5. This module is deliberately dependency-light (numpy only) so
-it can be unit-tested without the model stack.
-"""
-
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -64,12 +50,7 @@ def compute_reward(
     objectives: dict[str, float],
     weights: RewardWeights,
 ) -> float:
-    """Weighted sum of the four objective scores.
-
-    Each value in ``objectives`` is expected to already be normalized to [0, 1]
-    (see ``formation_to_score`` for the formation term). Missing objectives
-    default to 0.0.
-    """
+    """Weighted sum of the four objective scores (each must be in [0, 1]; missing -> 0.0)."""
     values = np.array([objectives.get(name, 0.0) for name in OBJECTIVES], dtype=float)
     if np.any((values < 0.0) | (values > 1.0)):
         raise ValueError(f"Objective scores must be in [0, 1], got {objectives}")

@@ -1,22 +1,3 @@
-"""Fetch + smoke-load the pretrained reward model(s) available off-the-shelf.
-
-    M3GNet (matgl)  -> formation-energy / stability evaluator  [pretrained]
-
-The topology signal (spin-orbit **spillage**) has NO off-the-shelf DGL-free
-pretrained model, so it is trained in the research phase on JARVIS-DFT spillage
-labels (downloaded by scripts/download_data.py) using a DGL-free framework —
-matgl (already here) or MACE-MP. ALIGNN was dropped: it needs DGL, which has no
-builds for modern torch/Python.
-
-Weights re-fetch reproducibly from (package version + handle); they are not
-DVC-tracked. This script proves the model loads and records it in
-models/pretrained/MODELS.md. The crystal *generator* (MatterGen) is handled
-separately by scripts/setup_mattergen.sh (it needs an isolated environment).
-
-Usage:
-    make download-models
-"""
-
 from __future__ import annotations
 
 import argparse
@@ -64,7 +45,9 @@ def write_manifest(lines: list[str]) -> None:
 
 
 def main() -> int:
-    argparse.ArgumentParser(description=__doc__).parse_args()
+    argparse.ArgumentParser(
+        description="Fetch + smoke-load the pretrained M3GNet stability model via matgl."
+    ).parse_args()
 
     lines = [fetch_m3gnet()]
     write_manifest(lines)

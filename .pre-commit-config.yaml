@@ -16,3 +16,11 @@ repos:
       - id: check-added-large-files
         args: [--maxkb=1024]   # block accidental commits of weights/data (use DVC)
       - id: check-merge-conflict
+
+  - repo: local
+    hooks:
+      - id: check-docstrings
+        name: no module docstrings, snippet-length docstrings
+        entry: python scripts/check_docstrings.py
+        language: python
+        types: [python]

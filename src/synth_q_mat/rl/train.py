@@ -1,11 +1,3 @@
-"""Entrypoint for MatInvent PPO training.
-
-Scaffold only: wires config -> reward -> (eventually) the PPO loop over the
-DiffCSP generator. Fill in the policy/env in weeks 3-4. Run with:
-
-    make train ARGS="train.total_steps=200000 reward.w_topology=0.5"
-"""
-
 from __future__ import annotations
 
 import sys
@@ -23,7 +15,7 @@ def main(argv: list[str] | None = None) -> int:
     print(f"[train] total_steps   : {cfg['train']['total_steps']}")
     print(f"[train] reward weights: {weights}")
     print(f"[train] checkpoints   : {cfg['paths']['checkpoints']}")
-    print("[train] TODO: build env over DiffCSP + run PPO (weeks 3-4)")
+    print("[train] TODO: build env over MatterGen + run PPO (weeks 3-4)")
     return 0
 
 

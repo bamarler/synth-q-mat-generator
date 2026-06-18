@@ -1,11 +1,3 @@
-"""Generate figures from evaluated results (week 9).
-
-Publication figures (matplotlib/seaborn): band structures with topological
-features, phonon dispersions, multi-objective Pareto fronts, RL-vs-baseline
-training curves. Interactive exploration (plotly): high-dimensional candidate
-browsing.
-"""
-
 from __future__ import annotations
 
 import sys
