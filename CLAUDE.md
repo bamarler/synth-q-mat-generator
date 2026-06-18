@@ -57,6 +57,27 @@ ESPRESSO) on an HPC cluster. Full proposal + timeline in `references/*.pdf`.
 - Run `make lint` and `make test` before committing. Ruff config and the test
   suite are in `pyproject.toml`.
 
+## Coding style
+
+Lazy means efficient, not careless. Follow YAGNI: don't build abstractions,
+config, or flexibility until something needs them. Stdlib over a dependency;
+the platform's feature over hand-rolled code; the shortest version that works.
+
+Comments earn their place — most code shouldn't need them:
+
+- **No module/file-level docstrings.** None. Documentation lives in classes and
+  functions, not in a banner at the top of the file. (Enforced by a pre-commit
+  hook: `scripts/check_docstrings.py`.)
+- **Class/method docstrings are snippets, not essays** — one line on what it
+  does; name params/returns only when the signature doesn't already make them
+  obvious. Keep them short (the hook caps length).
+- **Inline comments are rare and intentional** — reserve them for a genuinely
+  non-obvious line. When a line implements a formula or algorithm, say what it
+  computes and cite the source (paper, textbook, or named method), e.g.
+  `# spin-orbit spillage, Eq. 2 of Liu et al. 2019`.
+
+If an explanation is longer than the code it describes, cut the explanation.
+
 ## Current state
 
 Scaffold stage. The entrypoints (`rl/train.py`, `eval/baseline.py`,
