@@ -13,7 +13,8 @@ endif
 .PHONY: help check-deps setup sync pull push download-data download-models \
         setup-generator gen-smoke \
         baseline train eval viz hpc-train hpc-status mlflow-ui \
-        lint format test clean
+        lint format test clean \
+        extract-papers extract-paper
 
 # Colors for output
 GREEN  := \033[0;32m
@@ -171,3 +172,10 @@ clean: ## Remove caches and temporary outputs
 	@find . -type f -name '*.py[co]' -delete 2>/dev/null || true
 	@rm -rf results/tmp 2>/dev/null || true
 	@printf "  $(GREEN)$(CHECKMARK)$(NC) Clean\n\n"
+
+extract-papers: ## extract every paper missing a references/text/ output (incremental)
+	uv run python scripts/extract_paper.py --all $(ARGS)
+
+extract-paper: ## extract a single paper -> make extract-paper KEY=<bibkey>
+	@test -n "$(KEY)" || { echo "Usage: make extract-paper KEY=<bibkey> [ARGS=...]"; exit 1; }
+	uv run python scripts/extract_paper.py $(KEY) $(ARGS)
