@@ -31,12 +31,17 @@ ESPRESSO) on an HPC cluster. Full proposal + timeline in `references/*.pdf`.
 - **Topology predictor = DGL-free spillage regressor**, trained on JARVIS
   spillage labels (matgl or MACE-MP) in the research phase. ALIGNN was dropped:
   it needs DGL, which has no modern torch/Python builds.
-- **DVC** for data/RL-checkpoint versioning; default remote is
-  **s3://synth-q-mat-artifacts/dvc** (single-purpose IAM key scoped to that
-  bucket; per-machine credentials in gitignored `.dvc/config.local`, AWS keys
-  also in `.env` for the aws CLI). `.dvcstore` kept as `local-fallback` remote.
-  Pretrained reward/generator weights re-fetch from their package+handle, so
-  they are NOT DVC-tracked.
+- **DVC + Hydra** for config and reproducibility. `conf/` holds Hydra config
+  groups; DVC's Hydra integration (`hydra.enabled`) composes them into
+  `params.yaml`. Reproducible path: `dvc repro` (runs the committed
+  `params.yaml`). Exploration path: `dvc exp run -S key=val` (`make exp`/`sweep`),
+  which recomposes `params.yaml` each run. Default remote is
+  **s3://synth-q-mat-artifacts/dvc**; creds are `AWS_ACCESS_KEY_ID` /
+  `AWS_SECRET_ACCESS_KEY` in `.env` (boto3 reads them for dvc[s3] + the aws CLI —
+  no `.dvc/config.local` needed). `exp.auto_push` backs experiments up to S3 on
+  every run; `.dvcstore` is the `local-fallback` remote. Pretrained
+  reward/generator weights re-fetch from their package+handle, so they are NOT
+  DVC-tracked.
 - **MLflow** (self-hosted) for experiment tracking; runs link to git commits.
 - **MIT** license.
 - Viz: matplotlib/seaborn for publication, plotly for interactive.
@@ -46,18 +51,22 @@ ESPRESSO) on an HPC cluster. Full proposal + timeline in `references/*.pdf`.
 ## Working in this repo
 
 - Everything is driven through the **Makefile** — `make help` lists targets.
-  Common: `make setup`, `make sync`, `make pull`/`push`, `make train`,
-  `make baseline`, `make eval`, `make viz`, `make test`, `make lint`,
-  `make format`, `make mlflow-ui`.
-- Pass config overrides via `ARGS`, Hydra-style:
-  `make train ARGS="reward.w_topology=0.5 train.total_steps=200000"`.
+  Common: `make setup`, `make sync`, `make pull`/`push`, `make repro`,
+  `make train`/`baseline`/`eval`/`viz` (each = `dvc repro <stage>`), `make exp`,
+  `make sweep`, `make test`, `make lint`, `make format`, `make mlflow-ui`.
+- `make train` etc. reproduce the committed `params.yaml`. For overrides/tuning
+  use `make exp ARGS="reward.w_topology=0.5"` (a tracked `dvc exp run -S …`); use
+  `make sweep ARGS="reward.w_topology=0.3,0.4,0.5"` for a grid. `dvc exp run`
+  rewrites the working `params.yaml`, so `make repro`/`train` warn (`check-params`)
+  if it drifted from HEAD — `git checkout -- params.yaml` resets it.
 - Config lives in `conf/` (Hydra config groups), loaded by
   `src/synth_q_mat/config.py` as a plain dict — it reads `params.yaml` if present
   (DVC composes `conf/` into it), else composes `conf/` directly. Override
   Hydra-style: `reward.w_topology=0.5`.
 - Source entrypoints are module-runnable: `python -m synth_q_mat.rl.train`, etc.
 - Run `make lint` and `make test` before committing. Ruff config and the test
-  suite are in `pyproject.toml`.
+  suite are in `pyproject.toml`. **Full how-to (setup, cross-machine resume,
+  sweeps, credentials) lives in `CONTRIBUTING.md`.**
 
 ## Coding style
 
@@ -102,5 +111,9 @@ the reward in `src/synth_q_mat/rl/reward.py` (see `tests/test_reward.py`).
   Discovery. `scripts/hpc/*.sbatch` are generic SLURM templates; partition
   names, module loads, and the VASP launch command need adjusting once access
   is established.
-- Keep `data/`, `models/`, `results/` out of git (already in `.gitignore`); use
-  `dvc add` + `make push`.
+- Keep `data/`, `models/`, `results/` out of git (already in `.gitignore`).
+  `data/raw` is a manual `dvc add` artifact; pipeline outputs (checkpoints,
+  figures) are tracked by `dvc.yaml` and reach S3 via `dvc push` / `exp.auto_push`.
+- **Resuming on a fresh machine** needs two things DVC can't restore: `AWS_*`
+  creds in `.env`, and `make setup-generator` (MatterGen's isolated venv). Then
+  `git pull` + `make pull` + `dvc repro`.

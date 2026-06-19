@@ -38,75 +38,25 @@ then promising candidates are validated with DFT (VASP) and phonon calculations
 
 ```bash
 # Prerequisites: uv (https://astral.sh/uv) and Python 3.13
-make setup            # sync deps, init DVC + local remote, create .env
-# edit .env: add MP_API_KEY (free, https://next-gen.materialsproject.org/api)
+make setup            # sync deps, init DVC, create .env from template
+# edit .env: add AWS S3 creds + MP_API_KEY (see CONTRIBUTING.md)
 make check-deps       # confirm python/uv/dvc/aws/CUDA
 make test             # run unit tests
-make download-models  # fetch + smoke-load M3GNet (stability)
-make download-data ARGS="--source jarvis"   # raw databases (MP needs MP_API_KEY)
-
-# Crystal generator (isolated env — needs a working GPU):
-make setup-generator  # clone + install MatterGen into .venv-mattergen
-make gen-smoke        # generate a couple of structures to verify
+make repro            # run the pipeline: baseline -> train -> eval -> viz
 ```
 
-Run `make help` for all commands.
-
-### Models — why three different setups
-
-The 2026 materials-ML ecosystem is fragmented across incompatible dependency
-stacks, so each model is provisioned where it can actually run:
-
-- **M3GNet (stability)** — `matgl`, PyTorch-Geometric based, lives in the main
-  env. Fetched on demand by `make download-models`.
-- **Topology (spillage) predictor** — no DGL-free pretrained model exists, so
-  it's trained on JARVIS-DFT `spillage` labels in the research phase (matgl or
-  MACE-MP). ALIGNN was dropped: it needs DGL, which has no modern torch/Python
-  builds.
-- **MatterGen (generator)** — pins `torch==2.2.1+cu118` / `numpy<2.0`, which
-  can't co-exist with the main env, so it gets its own Python 3.10 venv and is
-  driven via its CLI.
-
-## Cross-machine workflow
-
-This project runs across a local Linux+NVIDIA workstation, the professor's HPC
-cluster, and possibly CPU-only machines. **Code** travels via git; **data and
-RL checkpoints** travel via DVC so any machine restores identical state. The DVC
-remote is `s3://synth-q-mat-artifacts/dvc` (a single-purpose IAM key scoped to
-just that bucket). Per machine, set the credentials once:
-
-```bash
-uv run dvc remote modify --local storage access_key_id <key>
-uv run dvc remote modify --local storage secret_access_key <secret>
-```
-
-These land in `.dvc/config.local`, which is gitignored. A `local-fallback`
-remote (`.dvcstore/`) exists for offline work: `dvc push -r local-fallback`.
-
-```bash
-# On any machine:
-git pull && make pull        # latest code + artifacts
-
-# After producing new data/checkpoints:
-dvc add models/checkpoints   # or data/raw, etc.
-make push                    # upload contents to the DVC remote
-git add models/checkpoints.dvc && git commit -m "..." && git push
-```
-
-Pretrained reward models (M3GNet) and MatterGen checkpoints re-fetch
-reproducibly from their package/handle, so they are **not** DVC-tracked — only
-downloaded data and our own RL checkpoints are.
-
-MLflow runs on the workstation (`make mlflow-ui`); HPC jobs log to it by setting
-`MLFLOW_TRACKING_URI` in `.env`. Every run is linked to its git commit.
+`make help` lists all commands. **[CONTRIBUTING.md](CONTRIBUTING.md)** is the
+full how-to: setup, credentials, the DVC + Hydra workflow, sweeps (`make exp` /
+`make sweep`), cross-machine resume, the MatterGen generator, and HPC.
 
 ## Layout
 
 ```
-configs/        Hydra/YAML experiment configs (reward weights, hyperparams)
+conf/           Hydra config groups (reward, train, composition, models)
+dvc.yaml        pipeline stages (baseline -> train -> eval -> viz); params.yaml is composed
 data/           DVC-tracked: raw + processed databases (gitignored)
 models/         pretrained manifest + MatterGen checkpoint + RL checkpoints (gitignored)
-results/        experiment outputs, DFT results (gitignored)
+results/        experiment outputs, DFT results (gitignored; metrics/ kept in git)
 scripts/        data/model download, MatterGen setup, HPC SLURM templates
 src/synth_q_mat/
   data/         dataset loaders + light-element filtering
