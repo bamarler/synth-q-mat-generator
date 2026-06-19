@@ -1,0 +1,21 @@
+# Base experiment config. Override Hydra-style, e.g.:
+#   make exp ARGS="reward.w_topology=0.5 train.total_steps=200000"
+defaults:
+  - reward: default
+  - train: default
+  - composition: default
+  - models: default
+  - _self_
+
+seed: 42
+
+paths:
+  data_raw: data/raw
+  data_processed: data/processed
+  pretrained: models/pretrained
+  checkpoints: models/checkpoints
+  results: results
+
+logging:
+  mlflow_experiment: synth-q-mat
+  log_every: 100

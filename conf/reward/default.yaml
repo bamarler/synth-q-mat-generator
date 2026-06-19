@@ -1,0 +1,6 @@
+# Multi-objective reward weights; tuned against the Pareto front (weeks 4-5).
+w_topology: 0.40          # P(topological)
+w_dos_fermi: 0.30         # density of states at E_F (superconductive tendency)
+w_formation: 0.20         # formation energy (stability / synthesizability)
+w_composition: 0.10       # light-element preference
+formation_energy_cutoff: 0.10   # eV/atom above hull considered synthesizable

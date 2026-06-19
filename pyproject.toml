@@ -36,7 +36,8 @@ dependencies = [
     "plotly>=5.22.0",
     # Config
     "pyyaml>=6.0",
-    "hydra-core>=1.3.0",       # Structured, override-able experiment configs
+    "hydra-core>=1.3.0",       # config groups; DVC composes conf/ -> params.yaml
+    "omegaconf>=2.3.0",        # imported directly by config.py (loads params.yaml)
 ]
 
 [project.optional-dependencies]

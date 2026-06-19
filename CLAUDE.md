@@ -51,8 +51,10 @@ ESPRESSO) on an HPC cluster. Full proposal + timeline in `references/*.pdf`.
   `make format`, `make mlflow-ui`.
 - Pass config overrides via `ARGS`, Hydra-style:
   `make train ARGS="reward.w_topology=0.5 train.total_steps=200000"`.
-- Config lives in `configs/defaults.yaml`, loaded by `src/synth_q_mat/config.py`
-  (a light loader with dotted-key overrides; swappable for full Hydra later).
+- Config lives in `conf/` (Hydra config groups), loaded by
+  `src/synth_q_mat/config.py` as a plain dict — it reads `params.yaml` if present
+  (DVC composes `conf/` into it), else composes `conf/` directly. Override
+  Hydra-style: `reward.w_topology=0.5`.
 - Source entrypoints are module-runnable: `python -m synth_q_mat.rl.train`, etc.
 - Run `make lint` and `make test` before committing. Ruff config and the test
   suite are in `pyproject.toml`.

@@ -1,0 +1,4 @@
+# Favor light elements (Li=3 .. Si=14) to reduce DFT cost.
+min_z: 3
+max_z: 14
+max_atoms_per_cell: 20

@@ -1,0 +1,4 @@
+# Pretrained model handles (resolved by scripts/download_models.py).
+generator: mattergen      # crystal structure generator (isolated env)
+topology: spillage_gnn    # DGL-free spillage regressor trained on JARVIS (matgl/MACE)
+stability: m3gnet         # M3GNet-Eform-MP-2018.6.1 via matgl (pretrained)

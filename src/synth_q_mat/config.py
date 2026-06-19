@@ -1,50 +1,31 @@
 from __future__ import annotations
 
-import ast
+import os
 from pathlib import Path
 from typing import Any
 
-import yaml
 from dotenv import load_dotenv
+from hydra import compose, initialize_config_dir
+from omegaconf import OmegaConf
 
-CONFIG_DIR = Path(__file__).resolve().parents[2] / "configs"
-DEFAULTS = CONFIG_DIR / "defaults.yaml"
+_ROOT = Path(__file__).resolve().parents[2]
+CONF_DIR = _ROOT / "conf"
+PARAMS = _ROOT / "params.yaml"
 
-# Load .env from the project root so entrypoints (download scripts, training)
-# pick up MP_API_KEY / MLFLOW_TRACKING_URI / AWS creds automatically.
-load_dotenv(CONFIG_DIR.parent / ".env")
-
-
-def _coerce(value: str) -> Any:
-    """Turn a CLI string into a bool/int/float/list where possible."""
-    try:
-        return ast.literal_eval(value)
-    except (ValueError, SyntaxError):
-        return value
+# Load .env so entrypoints (download scripts, training) pick up
+# MP_API_KEY / MLFLOW_TRACKING_URI / AWS creds automatically.
+load_dotenv(_ROOT / ".env")
 
 
-def _apply_override(cfg: dict[str, Any], dotted_key: str, value: Any) -> None:
-    keys = dotted_key.split(".")
-    node = cfg
-    for key in keys[:-1]:
-        node = node.setdefault(key, {})
-        if not isinstance(node, dict):
-            raise ValueError(f"Cannot override into non-mapping at '{key}'")
-    node[keys[-1]] = value
-
-
-def load_config(
-    path: str | Path = DEFAULTS,
-    overrides: list[str] | None = None,
-) -> dict[str, Any]:
-    """Load YAML config and apply ``key.subkey=value`` overrides."""
-    with open(path) as fh:
-        cfg: dict[str, Any] = yaml.safe_load(fh) or {}
-
-    for item in overrides or []:
-        if "=" not in item:
-            raise ValueError(f"Bad override '{item}'; expected key.subkey=value")
-        dotted_key, raw = item.split("=", 1)
-        _apply_override(cfg, dotted_key.strip(), _coerce(raw.strip()))
-
-    return cfg
+def load_config(overrides: list[str] | None = None) -> dict[str, Any]:
+    """Config as a plain dict: DVC-composed params.yaml if present, else Hydra-composed conf/."""
+    if not overrides and PARAMS.exists():
+        cfg = OmegaConf.load(PARAMS)
+    else:
+        if os.getenv("SQMG_DVC") and not PARAMS.exists():
+            raise RuntimeError(
+                "SQMG_DVC set but params.yaml missing — run via `dvc repro` / `dvc exp run`."
+            )
+        with initialize_config_dir(version_base=None, config_dir=str(CONF_DIR)):
+            cfg = compose(config_name="config", overrides=overrides or [])
+    return OmegaConf.to_container(cfg, resolve=True)

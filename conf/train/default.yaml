@@ -1,0 +1,11 @@
+# PPO / MatInvent training.
+algorithm: ppo
+total_steps: 100000
+n_envs: 8
+batch_size: 256
+learning_rate: 3.0e-4
+gamma: 0.99
+gae_lambda: 0.95
+clip_range: 0.2
+kl_target: 0.02           # KL to the pretrained prior; key stability knob
+checkpoint_every: 5000
