@@ -1,16 +1,27 @@
 from __future__ import annotations
 
+import json
 import sys
+from pathlib import Path
 
 from synth_q_mat.config import load_config
 
 
 def main(argv: list[str] | None = None) -> int:
     cfg = load_config(overrides=argv if argv is not None else sys.argv[1:])
+    results = Path(cfg["paths"]["results"])
     print("[evaluate] config loaded")
     print(f"[evaluate] checkpoints: {cfg['paths']['checkpoints']}")
-    print(f"[evaluate] results    : {cfg['paths']['results']}")
+    print(f"[evaluate] results    : {results}")
     print("[evaluate] TODO: rank candidates, compute Pareto front (weeks 5, 9)")
+
+    results.mkdir(parents=True, exist_ok=True)
+    (results / "candidates.json").write_text(
+        json.dumps({"candidates": [], "placeholder": True}) + "\n"
+    )
+    metric = results / "metrics" / "eval.json"
+    metric.parent.mkdir(parents=True, exist_ok=True)
+    metric.write_text(json.dumps({"stage": "eval", "placeholder": True}) + "\n")
     return 0
 
 

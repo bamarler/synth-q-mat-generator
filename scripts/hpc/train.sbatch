@@ -23,7 +23,16 @@ source .env 2>/dev/null || true  # picks up MLFLOW_TRACKING_URI, MP_API_KEY, etc
 export MLFLOW_TRACKING_URI="${MLFLOW_TRACKING_URI:-http://127.0.0.1:5000}"
 
 # --- run -----------------------------------------------------------------
-echo "[hpc] node: $(hostname)  job: ${SLURM_JOB_ID:-local}"
-uv run python -m synth_q_mat.rl.train ${ARGS:-}
+# MatterGen lives in an isolated env DVC can't restore — set it up first.
+if [ ! -x .venv-mattergen/bin/mattergen-generate ]; then
+    echo "[hpc] ERROR: .venv-mattergen missing — run 'make setup-generator' on this node first." >&2
+    exit 1
+fi
 
-echo "[hpc] training finished; sync checkpoints with: make push"
+echo "[hpc] node: $(hostname)  job: ${SLURM_JOB_ID:-local}"
+uv run dvc pull                  # restore data + prior checkpoints from S3
+uv run dvc repro train           # run the committed params.yaml (reproducible)
+uv run dvc push                  # back up new checkpoints/metrics to S3
+
+echo "[hpc] done. Commit + push so other machines can resume:"
+echo "      git add dvc.lock results/metrics && git commit -m 'hpc: train' && git push"

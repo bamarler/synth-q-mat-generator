@@ -1,5 +1,10 @@
 [core]
     remote = storage
+    autostage = true
+[hydra]
+    enabled = true
+[exp]
+    auto_push = true
 ['remote "local-fallback"']
     url = ../.dvcstore
 ['remote "storage"']

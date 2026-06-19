@@ -1,0 +1,56 @@
+stages:
+  baseline:
+    cmd: SQMG_DVC=1 python -m synth_q_mat.eval.baseline
+    deps:
+      - src/synth_q_mat/eval/baseline.py
+      - src/synth_q_mat/config.py
+    params:
+      - seed
+      - composition
+      - models
+    metrics:
+      - results/metrics/baseline.json:
+          cache: false
+
+  train:
+    cmd: SQMG_DVC=1 python -m synth_q_mat.rl.train
+    deps:
+      - src/synth_q_mat/rl/train.py
+      - src/synth_q_mat/rl/reward.py
+      - src/synth_q_mat/config.py
+    params:
+      - seed
+      - reward
+      - train
+      - composition
+      - models
+    outs:
+      - models/checkpoints:
+          persist: true
+    metrics:
+      - results/metrics/train.json:
+          cache: false
+
+  eval:
+    cmd: SQMG_DVC=1 python -m synth_q_mat.eval.evaluate
+    deps:
+      - src/synth_q_mat/eval/evaluate.py
+      - src/synth_q_mat/config.py
+      - models/checkpoints
+    params:
+      - seed
+      - reward
+    outs:
+      - results/candidates.json
+    metrics:
+      - results/metrics/eval.json:
+          cache: false
+
+  viz:
+    cmd: SQMG_DVC=1 python -m synth_q_mat.viz.generate
+    deps:
+      - src/synth_q_mat/viz/generate.py
+      - src/synth_q_mat/config.py
+      - results/candidates.json
+    outs:
+      - results/figures

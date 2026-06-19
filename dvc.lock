@@ -1,0 +1,137 @@
+schema: '2.0'
+stages:
+  baseline:
+    cmd: SQMG_DVC=1 python -m synth_q_mat.eval.baseline
+    deps:
+    - path: src/synth_q_mat/config.py
+      hash: md5
+      md5: 1601ee809046ed66cb7f64f86e3f350e
+      size: 1133
+    - path: src/synth_q_mat/eval/baseline.py
+      hash: md5
+      md5: 2f5f36e3ebad834fc1c28fc94e542e50
+      size: 842
+    params:
+      params.yaml:
+        composition:
+          min_z: 3
+          max_z: 14
+          max_atoms_per_cell: 20
+        models:
+          generator: mattergen
+          topology: spillage_gnn
+          stability: m3gnet
+        seed: 42
+    outs:
+    - path: results/metrics/baseline.json
+      hash: md5
+      md5: 6699b7e34032c4f4ad9eb3e61239c960
+      size: 43
+  train:
+    cmd: SQMG_DVC=1 python -m synth_q_mat.rl.train
+    deps:
+    - path: src/synth_q_mat/config.py
+      hash: md5
+      md5: 1601ee809046ed66cb7f64f86e3f350e
+      size: 1133
+    - path: src/synth_q_mat/rl/reward.py
+      hash: md5
+      md5: b2e74f93bae8e7bde53a1602a8da93b5
+      size: 1941
+    - path: src/synth_q_mat/rl/train.py
+      hash: md5
+      md5: e8f319b1db9af8bd241ade58f1d0a6de
+      size: 1158
+    params:
+      params.yaml:
+        composition:
+          min_z: 3
+          max_z: 14
+          max_atoms_per_cell: 20
+        models:
+          generator: mattergen
+          topology: spillage_gnn
+          stability: m3gnet
+        reward:
+          w_topology: 0.4
+          w_dos_fermi: 0.3
+          w_formation: 0.2
+          w_composition: 0.1
+          formation_energy_cutoff: 0.1
+        seed: 42
+        train:
+          algorithm: ppo
+          total_steps: 100000
+          n_envs: 8
+          batch_size: 256
+          learning_rate: 0.0003
+          gamma: 0.99
+          gae_lambda: 0.95
+          clip_range: 0.2
+          kl_target: 0.02
+          checkpoint_every: 5000
+    outs:
+    - path: models/checkpoints
+      hash: md5
+      md5: 0cab2d097d2d440c0398e0d0e4266613.dir
+      size: 24
+      nfiles: 1
+    - path: results/metrics/train.json
+      hash: md5
+      md5: 0a30c93d8d0714fdc140fa5a1f97c504
+      size: 40
+  eval:
+    cmd: SQMG_DVC=1 python -m synth_q_mat.eval.evaluate
+    deps:
+    - path: models/checkpoints
+      hash: md5
+      md5: 0cab2d097d2d440c0398e0d0e4266613.dir
+      size: 24
+      nfiles: 1
+    - path: src/synth_q_mat/config.py
+      hash: md5
+      md5: 1601ee809046ed66cb7f64f86e3f350e
+      size: 1133
+    - path: src/synth_q_mat/eval/evaluate.py
+      hash: md5
+      md5: 21d8c0ca27a36e9a33da109aabddc597
+      size: 952
+    params:
+      params.yaml:
+        reward:
+          w_topology: 0.4
+          w_dos_fermi: 0.3
+          w_formation: 0.2
+          w_composition: 0.1
+          formation_energy_cutoff: 0.1
+        seed: 42
+    outs:
+    - path: results/candidates.json
+      hash: md5
+      md5: 43ebf20c409e1453285e869c19a3c27c
+      size: 40
+    - path: results/metrics/eval.json
+      hash: md5
+      md5: b28b3f15514be44c1cb34a05b0a91966
+      size: 39
+  viz:
+    cmd: SQMG_DVC=1 python -m synth_q_mat.viz.generate
+    deps:
+    - path: results/candidates.json
+      hash: md5
+      md5: 43ebf20c409e1453285e869c19a3c27c
+      size: 40
+    - path: src/synth_q_mat/config.py
+      hash: md5
+      md5: 1601ee809046ed66cb7f64f86e3f350e
+      size: 1133
+    - path: src/synth_q_mat/viz/generate.py
+      hash: md5
+      md5: d4c95cab79a5af0fa7a4c19accb45d33
+      size: 665
+    outs:
+    - path: results/figures
+      hash: md5
+      md5: 19dd21c4c298a30659cc080654a50a43.dir
+      size: 21
+      nfiles: 1

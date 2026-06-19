@@ -12,7 +12,8 @@ endif
 
 .PHONY: help check-deps setup sync pull push download-data download-models \
         setup-generator gen-smoke \
-        baseline train eval viz hpc-train hpc-status mlflow-ui \
+        baseline train eval viz repro exp sweep check-params \
+        hpc-train hpc-status mlflow-ui \
         lint format test clean \
         extract-papers extract-paper
 
@@ -30,9 +31,8 @@ CROSSMARK := [NO]
 PROJECT_NAME  := synth-q-mat-generator
 PYTHON_VER    := 3.13
 # Default DVC remote: S3 (single-purpose IAM key scoped to this bucket).
-# Credentials live in .dvc/config.local (gitignored) — on a new machine run:
-#   uv run dvc remote modify --local storage access_key_id <key>
-#   uv run dvc remote modify --local storage secret_access_key <secret>
+# Credentials: put AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY in .env — boto3
+# reads them for both dvc[s3] and the aws CLI, so one file covers both.
 # A local fallback remote 'local-fallback' (.dvcstore) also exists:
 #   uv run dvc push -r local-fallback
 DVC_REMOTE    := s3://synth-q-mat-artifacts/dvc
@@ -76,12 +76,15 @@ setup: ## One-time setup: sync deps, init DVC, configure local remote
 	@if [ ! -d .dvc ]; then \
 		$(UV_RUN) dvc init; \
 		$(UV_RUN) dvc remote add -d storage $(DVC_REMOTE); \
+		$(UV_RUN) dvc config hydra.enabled true; \
+		$(UV_RUN) dvc config core.autostage true; \
+		$(UV_RUN) dvc config exp.auto_push true; \
 		printf "  $(GREEN)$(CHECKMARK)$(NC) DVC initialized with remote $(DVC_REMOTE)\n"; \
 	else \
 		printf "  $(GREEN)$(CHECKMARK)$(NC) DVC already initialized\n"; \
 	fi
-	@if [ ! -f .dvc/config.local ]; then \
-		printf "  $(YELLOW)[ACTION]$(NC) S3 credentials not set on this machine — see DVC_REMOTE comment above 'setup'\n"; \
+	@if ! grep -q '^AWS_ACCESS_KEY_ID=.\+' .env 2>/dev/null && [ -z "$${AWS_ACCESS_KEY_ID:-}" ]; then \
+		printf "  $(YELLOW)[ACTION]$(NC) S3 creds not found — add AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY to .env (DVC + aws CLI both read them)\n"; \
 	fi
 	@if [ ! -f .env ]; then cp .env.example .env; \
 		printf "  $(YELLOW)[ACTION]$(NC) Created .env from template - add your MP_API_KEY\n"; fi
@@ -120,21 +123,41 @@ gen-smoke: ## Smoke-test MatterGen: generate a couple of structures
 		printf "  $(RED)$(CROSSMARK)$(NC) $(MATTERGEN_VENV) missing - run 'make setup-generator' first\n"; exit 1; fi
 	@VENV_DIR=$(MATTERGEN_VENV) bash scripts/gen_smoke.sh
 
-baseline: ## Evaluate unconditional generation baseline
-	@printf "$(BLUE)Running baseline evaluation...\n$(NC)\n"
-	@$(UV_RUN) python -m synth_q_mat.eval.baseline $(ARGS)
+check-params:
+	@if ! git diff --quiet -- params.yaml 2>/dev/null; then \
+		printf "  $(YELLOW)[WARN]$(NC) params.yaml differs from HEAD (a prior 'dvc exp run' may have rewritten it).\n"; \
+		printf "         'dvc repro' uses the working copy; 'git checkout -- params.yaml' restores the committed config.\n"; \
+	fi
 
-train: ## Train the MatInvent PPO policy (override config via ARGS)
-	@printf "$(BLUE)Starting RL training...\n$(NC)\n"
-	@$(UV_RUN) python -m synth_q_mat.rl.train $(ARGS)
+repro: check-params ## Reproduce the whole pipeline from committed params.yaml
+	@printf "$(BLUE)Reproducing pipeline...\n$(NC)\n"
+	@$(UV_RUN) dvc repro
 
-eval: ## Evaluate / rank generated candidates
-	@printf "$(BLUE)Running candidate evaluation...\n$(NC)\n"
-	@$(UV_RUN) python -m synth_q_mat.eval.evaluate $(ARGS)
+baseline: check-params ## Reproduce the baseline stage
+	@printf "$(BLUE)Reproducing baseline...\n$(NC)\n"
+	@$(UV_RUN) dvc repro baseline
 
-viz: ## Generate figures (Pareto fronts, band structures, training curves)
-	@printf "$(BLUE)Generating visualizations...\n$(NC)\n"
-	@$(UV_RUN) python -m synth_q_mat.viz.generate $(ARGS)
+train: check-params ## Reproduce the train stage (override via 'make exp')
+	@printf "$(BLUE)Reproducing train...\n$(NC)\n"
+	@$(UV_RUN) dvc repro train
+
+eval: check-params ## Reproduce the eval stage
+	@printf "$(BLUE)Reproducing eval...\n$(NC)\n"
+	@$(UV_RUN) dvc repro eval
+
+viz: check-params ## Reproduce the viz stage
+	@printf "$(BLUE)Reproducing viz...\n$(NC)\n"
+	@$(UV_RUN) dvc repro viz
+
+exp: ## Tracked experiment with overrides: make exp ARGS="reward.w_topology=0.5"
+	@printf "$(BLUE)Running experiment...\n$(NC)\n"
+	@$(UV_RUN) dvc exp run $(foreach a,$(ARGS),-S $(a))
+
+sweep: ## Queue + run a grid sweep: make sweep ARGS="reward.w_topology=0.3,0.4,0.5"
+	@printf "$(BLUE)Queuing sweep...\n$(NC)\n"
+	@$(UV_RUN) dvc exp run --queue $(foreach a,$(ARGS),-S $(a))
+	@$(UV_RUN) dvc queue start
+	@printf "  $(GREEN)$(CHECKMARK)$(NC) Started. Watch: uv run dvc exp show\n"
 
 hpc-train: ## Submit RL training as a SLURM job on the HPC cluster
 	@printf "$(BLUE)Submitting SLURM training job...\n$(NC)\n"

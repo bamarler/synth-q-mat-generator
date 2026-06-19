@@ -1,0 +1,35 @@
+reward:
+  w_topology: 0.4
+  w_dos_fermi: 0.3
+  w_formation: 0.2
+  w_composition: 0.1
+  formation_energy_cutoff: 0.1
+train:
+  algorithm: ppo
+  total_steps: 100000
+  n_envs: 8
+  batch_size: 256
+  learning_rate: 0.0003
+  gamma: 0.99
+  gae_lambda: 0.95
+  clip_range: 0.2
+  kl_target: 0.02
+  checkpoint_every: 5000
+composition:
+  min_z: 3
+  max_z: 14
+  max_atoms_per_cell: 20
+models:
+  generator: mattergen
+  topology: spillage_gnn
+  stability: m3gnet
+seed: 42
+paths:
+  data_raw: data/raw
+  data_processed: data/processed
+  pretrained: models/pretrained
+  checkpoints: models/checkpoints
+  results: results
+logging:
+  mlflow_experiment: synth-q-mat
+  log_every: 100

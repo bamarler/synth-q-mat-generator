@@ -22,6 +22,8 @@ venv/
 /results/**
 !/results/**/
 !/results/**/*.dvc
+# Keep cache:false metrics in git (legible cross-machine without a dvc pull).
+!/results/metrics/*.json
 
 # DVC cache / internals
 .dvc/cache/

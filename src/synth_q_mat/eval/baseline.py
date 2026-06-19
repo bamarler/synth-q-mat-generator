@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import json
 import sys
+from pathlib import Path
 
 from synth_q_mat.config import load_config
 
@@ -13,6 +15,10 @@ def main(argv: list[str] | None = None) -> int:
         f"[baseline] Z range    : {cfg['composition']['min_z']}-{cfg['composition']['max_z']}"
     )
     print("[baseline] TODO: sample N structures, score with spillage + M3GNet (week 2)")
+
+    metric = Path(cfg["paths"]["results"]) / "metrics" / "baseline.json"
+    metric.parent.mkdir(parents=True, exist_ok=True)
+    metric.write_text(json.dumps({"stage": "baseline", "placeholder": True}) + "\n")
     return 0
 
 
