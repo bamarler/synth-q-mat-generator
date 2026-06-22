@@ -1,0 +1,379 @@
+
+% Reference corpus for synth-q-mat-generator.
+% Citation keys match the PDF filenames in references/papers/.
+% Per request: no `doi` field; the DOI is given as a doi.org URL in `url`.
+% arXiv-only works use the arXiv DataCite DOI (10.48550/arXiv.XXXX) as the URL.
+% NOTE: a few author lists are abbreviated with "and others" — verify before publication.
+
+% ===================== Generators =====================
+
+@article{zeni2025mattergen,
+  title   = {A generative model for inorganic materials design},
+  author  = {Zeni, Claudio and Pinsler, Robert and Z{\"u}gner, Daniel and Fowler, Andrew and Horton, Matthew and Fu, Xiang and Shysheya, Sasha and Crabb{\'e}, Jonathan and Sun, Lixin and Smith, Jake and others and Xie, Tian},
+  journal = {Nature},
+  volume  = {639},
+  pages   = {624--632},
+  year    = {2025},
+  url     = {https://doi.org/10.1038/s41586-025-08628-5},
+  note    = {arXiv:2312.03687}
+}
+
+@inproceedings{jiao2023diffcsp,
+  title     = {Crystal Structure Prediction by Joint Equivariant Diffusion},
+  author    = {Jiao, Rui and Huang, Wenbing and Lin, Peijia and Han, Jiaqi and Chen, Pin and Lu, Yutong and Liu, Yang},
+  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
+  volume    = {36},
+  year      = {2023},
+  url       = {https://doi.org/10.48550/arXiv.2309.04475},
+  eprint    = {2309.04475},
+  archivePrefix = {arXiv}
+}
+
+% ===================== RL methods & theory =====================
+
+@article{chen2025matinvent,
+  title   = {Accelerating inverse materials design using generative diffusion models with reinforcement learning},
+  author  = {Chen, Junwu and Guo, Jeff and Schwaller, Philippe},
+  journal = {arXiv preprint arXiv:2511.03112},
+  year    = {2025},
+  url     = {https://doi.org/10.48550/arXiv.2511.03112},
+  eprint  = {2511.03112},
+  archivePrefix = {arXiv},
+  note    = {Also: MatInvent, AI for Accelerated Materials Design Workshop, ICLR 2025}
+}
+
+@article{schulman2017ppo,
+  title   = {Proximal Policy Optimization Algorithms},
+  author  = {Schulman, John and Wolski, Filip and Dhariwal, Prafulla and Radford, Alec and Klimov, Oleg},
+  journal = {arXiv preprint arXiv:1707.06347},
+  year    = {2017},
+  url     = {https://doi.org/10.48550/arXiv.1707.06347},
+  eprint  = {1707.06347},
+  archivePrefix = {arXiv}
+}
+
+@inproceedings{haarnoja2018sac,
+  title     = {Soft Actor-Critic: Off-Policy Maximum Entropy Deep Reinforcement Learning with a Stochastic Actor},
+  author    = {Haarnoja, Tuomas and Zhou, Aurick and Abbeel, Pieter and Levine, Sergey},
+  booktitle = {International Conference on Machine Learning (ICML)},
+  year      = {2018},
+  url       = {https://doi.org/10.48550/arXiv.1801.01290},
+  eprint    = {1801.01290},
+  archivePrefix = {arXiv}
+}
+
+@inproceedings{bengio2021gflownet,
+  title     = {Flow Network based Generative Models for Non-Iterative Diverse Candidate Generation},
+  author    = {Bengio, Emmanuel and Jain, Moksh and Korablyov, Maksym and Precup, Doina and Bengio, Yoshua},
+  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
+  volume    = {34},
+  year      = {2021},
+  url       = {https://doi.org/10.48550/arXiv.2106.04399},
+  eprint    = {2106.04399},
+  archivePrefix = {arXiv}
+}
+
+@inproceedings{black2023ddpo,
+  title     = {Training Diffusion Models with Reinforcement Learning},
+  author    = {Black, Kevin and Janner, Michael and Du, Yilun and Kostrikov, Ilya and Levine, Sergey},
+  booktitle = {International Conference on Learning Representations (ICLR)},
+  year      = {2024},
+  url       = {https://doi.org/10.48550/arXiv.2305.13301},
+  eprint    = {2305.13301},
+  archivePrefix = {arXiv}
+}
+
+@inproceedings{fan2023dpok,
+  title     = {DPOK: Reinforcement Learning for Fine-tuning Text-to-Image Diffusion Models},
+  author    = {Fan, Ying and Watkins, Olivia and Du, Yuqing and Liu, Hao and Ryu, Moonkyung and Boutilier, Craig and Abbeel, Pieter and Ghavamzadeh, Mohammad and Lee, Kangwook and Lee, Kimin},
+  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
+  volume    = {36},
+  year      = {2023},
+  url       = {https://doi.org/10.48550/arXiv.2305.16381},
+  eprint    = {2305.16381},
+  archivePrefix = {arXiv}
+}
+
+@article{olivecrona2017reinvent,
+  title   = {Molecular de-novo design through deep reinforcement learning},
+  author  = {Olivecrona, Marcus and Blaschke, Thomas and Engkvist, Ola and Chen, Hongming},
+  journal = {Journal of Cheminformatics},
+  volume  = {9},
+  number  = {48},
+  year    = {2017},
+  url     = {https://doi.org/10.1186/s13321-017-0235-x}
+}
+
+@article{roijers2013morl,
+  title   = {A Survey of Multi-Objective Sequential Decision-Making},
+  author  = {Roijers, Diederik M. and Vamplew, Peter and Whiteson, Shimon and Dazeley, Richard},
+  journal = {Journal of Artificial Intelligence Research},
+  volume  = {48},
+  pages   = {67--113},
+  year    = {2013},
+  url     = {https://doi.org/10.1613/jair.3987}
+}
+
+@book{sutton2018rl,
+  title     = {Reinforcement Learning: An Introduction},
+  author    = {Sutton, Richard S. and Barto, Andrew G.},
+  edition   = {2nd},
+  publisher = {MIT Press},
+  year      = {2018},
+  url       = {http://incompleteideas.net/book/the-book-2nd.html}
+}
+
+% ===================== Predictors & potentials =====================
+
+@article{chen2022m3gnet,
+  title   = {A universal graph deep learning interatomic potential for the periodic table},
+  author  = {Chen, Chi and Ong, Shyue Ping},
+  journal = {Nature Computational Science},
+  volume  = {2},
+  pages   = {718--728},
+  year    = {2022},
+  url     = {https://doi.org/10.1038/s43588-022-00349-3},
+  note    = {arXiv:2202.02450}
+}
+
+@inproceedings{batatia2022mace,
+  title     = {MACE: Higher Order Equivariant Message Passing Neural Networks for Fast and Accurate Force Fields},
+  author    = {Batatia, Ilyes and Kov{\'a}cs, D{\'a}vid P{\'e}ter and Simm, Gregor N. C. and Ortner, Christoph and Cs{\'a}nyi, G{\'a}bor},
+  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
+  volume    = {35},
+  year      = {2022},
+  url       = {https://doi.org/10.48550/arXiv.2206.07697},
+  eprint    = {2206.07697},
+  archivePrefix = {arXiv}
+}
+
+@article{choudhary2021alignn,
+  title   = {Atomistic Line Graph Neural Network for improved materials property predictions},
+  author  = {Choudhary, Kamal and DeCost, Brian},
+  journal = {npj Computational Materials},
+  volume  = {7},
+  number  = {185},
+  year    = {2021},
+  url     = {https://doi.org/10.1038/s41524-021-00650-1},
+  note    = {arXiv:2106.01829; see author correction npj Comput. Mater. (2022)}
+}
+
+@article{miksch2021mlsimulations,
+  title   = {Strategies for the construction of machine-learning potentials for accurate and efficient atomic-scale simulations},
+  author  = {Miksch, April M. and Morawietz, Tobias and K{\"a}stner, Johannes and Urban, Alexander and Artrith, Nongnuch},
+  journal = {Machine Learning: Science and Technology},
+  volume  = {2},
+  number  = {3},
+  pages   = {031001},
+  year    = {2021},
+  url     = {https://doi.org/10.1088/2632-2153/abfd96},
+  note    = {arXiv:2101.10468}
+}
+
+@article{choudhary2019spillage,
+  title   = {High-throughput Discovery of Topologically Non-trivial Materials using Spin-orbit Spillage},
+  author  = {Choudhary, Kamal and Garrity, Kevin F. and Tavazza, Francesca},
+  journal = {Scientific Reports},
+  volume  = {9},
+  number  = {8534},
+  year    = {2019},
+  url     = {https://doi.org/10.1038/s41598-019-45028-y},
+  note    = {arXiv:1810.10640}
+}
+
+@article{choudhary2021magnetic_spillage,
+  title   = {High-throughput search for magnetic topological materials using spin-orbit spillage, machine learning, and experiments},
+  author  = {Choudhary, Kamal and Garrity, Kevin F. and Jiang, Jie and Pachter, Ruth and Tavazza, Francesca},
+  journal = {Physical Review B},
+  volume  = {103},
+  number  = {155131},
+  year    = {2021},
+  url     = {https://doi.org/10.1103/PhysRevB.103.155131},
+  note    = {arXiv:2102.00237}
+}
+
+% ===================== Quantum-materials physics =====================
+
+@article{bradlyn2017tqc,
+  title   = {Topological quantum chemistry},
+  author  = {Bradlyn, Barry and Elcoro, L. and Cano, Jennifer and Vergniory, M. G. and Wang, Zhijun and Felser, C. and Aroyo, M. I. and Bernevig, B. Andrei},
+  journal = {Nature},
+  volume  = {547},
+  number  = {7663},
+  pages   = {298--305},
+  year    = {2017},
+  url     = {https://doi.org/10.1038/nature23268},
+  note    = {arXiv:1703.02050; author correction Nature 582, E14 (2020)}
+}
+
+@article{zhang2009topological,
+  title   = {Topological insulators in Bi2Se3, Bi2Te3 and Sb2Te3 with a single Dirac cone on the surface},
+  author  = {Zhang, Haijun and Liu, Chao-Xing and Qi, Xiao-Liang and Dai, Xi and Fang, Zhong and Zhang, Shou-Cheng},
+  journal = {Nature Physics},
+  volume  = {5},
+  pages   = {438--442},
+  year    = {2009},
+  url     = {https://doi.org/10.1038/nphys1270}
+}
+
+@article{lutchyn2018majorana,
+  title   = {Majorana zero modes in superconductor--semiconductor heterostructures},
+  author  = {Lutchyn, Roman M. and Bakkers, Erik P. A. M. and Kouwenhoven, Leo P. and Krogstrup, Peter and Marcus, Charles M. and Oreg, Yuval},
+  journal = {Nature Reviews Materials},
+  volume  = {3},
+  pages   = {52--68},
+  year    = {2018},
+  url     = {https://doi.org/10.1038/s41578-018-0003-1}
+}
+
+% ===================== Synthesizability & discovery =====================
+
+@article{cao2025crystalformer,
+  title   = {CrystalFormer-RL: Reinforcement Fine-Tuning for Materials Design},
+  author  = {Cao, Zhendong and Wang, Lei},
+  journal = {arXiv preprint arXiv:2504.02367},
+  year    = {2025},
+  url     = {https://doi.org/10.48550/arXiv.2504.02367},
+  eprint  = {2504.02367},
+  archivePrefix = {arXiv}
+}
+
+@article{jang2020synthesizability,
+  title   = {Structure-Based Synthesizability Prediction of Crystals Using Partially Supervised Learning},
+  author  = {Jang, Jidon and Gu, Geun Ho and Noh, Juhwan and Kim, Juho and Jung, Yousung},
+  journal = {Journal of the American Chemical Society},
+  volume  = {142},
+  number  = {44},
+  pages   = {18836--18843},
+  year    = {2020},
+  url     = {https://doi.org/10.1021/jacs.0c07384}
+}
+
+@article{aykol2018thermolimit,
+  title   = {Thermodynamic limit for synthesis of metastable inorganic materials},
+  author  = {Aykol, Muratahan and Dwaraknath, Shyam S. and Sun, Wenhao and Persson, Kristin A.},
+  journal = {Science Advances},
+  volume  = {4},
+  number  = {4},
+  pages   = {eaaq0148},
+  year    = {2018},
+  url     = {https://doi.org/10.1126/sciadv.aaq0148}
+}
+
+@article{bartel2022stability,
+  title   = {Review of computational approaches to predict the thermodynamic stability of inorganic solids},
+  author  = {Bartel, Christopher J.},
+  journal = {Journal of Materials Science},
+  volume  = {57},
+  pages   = {10475--10498},
+  year    = {2022},
+  url     = {https://doi.org/10.1007/s10853-022-06915-4}
+}
+
+@article{merchant2023gnome,
+  title   = {Scaling deep learning for materials discovery},
+  author  = {Merchant, Amil and Batzner, Simon and Schoenholz, Samuel S. and Aykol, Muratahan and Cheon, Gowoon and Cubuk, Ekin Dogus},
+  journal = {Nature},
+  volume  = {624},
+  pages   = {80--85},
+  year    = {2023},
+  url     = {https://doi.org/10.1038/s41586-023-06735-9}
+}
+
+@article{szymanski2023alab,
+  title   = {An autonomous laboratory for the accelerated synthesis of novel materials},
+  author  = {Szymanski, Nathan J. and Rendy, Bernardus and Fei, Yuxing and Kumar, Rishi E. and He, Tanjin and Milsted, David and McDermott, Matthew J. and Gallant, Max and Cubuk, Ekin Dogus and Merchant, Amil and Kim, Haegyeom and Jain, Anubhav and Bartel, Christopher J. and Persson, Kristin A. and Zeng, Yan and Ceder, Gerbrand},
+  journal = {Nature},
+  volume  = {624},
+  pages   = {86--91},
+  year    = {2023},
+  url     = {https://doi.org/10.1038/s41586-023-06734-w},
+  note    = {author correction Nature 650, E1 (2026)}
+}
+
+@article{cheetham2024gnom_critique,
+  title   = {Artificial Intelligence Driving Materials Discovery? Perspective on the Article: Scaling Deep Learning for Materials Discovery},
+  author  = {Cheetham, Anthony K. and Seshadri, Ram},
+  journal = {Chemistry of Materials},
+  volume  = {36},
+  number  = {8},
+  pages   = {3490--3495},
+  year    = {2024},
+  url     = {https://doi.org/10.1021/acs.chemmater.4c00643}
+}
+
+@article{leeman2024challenges,
+  title   = {Challenges in High-Throughput Inorganic Materials Prediction and Autonomous Synthesis},
+  author  = {Leeman, Joshua and Liu, Yuhan and Stiles, Jan and Lee, Sun Bin and Bhatt, Prachi and Schoop, Leslie M. and Palgrave, Robert G.},
+  journal = {PRX Energy},
+  volume  = {3},
+  number  = {1},
+  pages   = {011002},
+  year    = {2024},
+  url     = {https://doi.org/10.1103/PRXEnergy.3.011002}
+}
+
+@article{cheetham2025digitalage,
+  title   = {Discovery of Crystalline Inorganic Solids in the Digital Age},
+  author  = {Cheetham, Anthony K. and Seshadri, Ram},
+  journal = {Accounts of Chemical Research},
+  year    = {2025},
+  url     = {https://doi.org/10.1021/acs.accounts.4c00694}
+}
+
+% ===================== Data sources =====================
+
+@article{choudhary2020jarvis,
+  title   = {The joint automated repository for various integrated simulations (JARVIS) for data-driven materials design},
+  author  = {Choudhary, Kamal and Garrity, Kevin F. and Reid, Andrew C. E. and DeCost, Brian and others and Tavazza, Francesca},
+  journal = {npj Computational Materials},
+  volume  = {6},
+  number  = {173},
+  year    = {2020},
+  url     = {https://doi.org/10.1038/s41524-020-00440-1}
+}
+
+@article{jain2013materialsproject,
+  title   = {Commentary: The Materials Project: A materials genome approach to accelerating materials innovation},
+  author  = {Jain, Anubhav and Ong, Shyue Ping and Hautier, Geoffroy and Chen, Wei and Richards, William Davidson and Dacek, Stephen and Cholia, Shreyas and Gunter, Dan and Skinner, David and Ceder, Gerbrand and Persson, Kristin A.},
+  journal = {APL Materials},
+  volume  = {1},
+  number  = {1},
+  pages   = {011002},
+  year    = {2013},
+  url     = {https://doi.org/10.1063/1.4812323}
+}
+
+% ===================== Simulation & DFT tooling =====================
+
+@article{ong2013pymatgen,
+  title   = {Python Materials Genomics (pymatgen): A robust, open-source python library for materials analysis},
+  author  = {Ong, Shyue Ping and Richards, William Davidson and Jain, Anubhav and Hautier, Geoffroy and Kocher, Michael and Cholia, Shreyas and Gunter, Dan and Chevrier, Vincent L. and Persson, Kristin A. and Ceder, Gerbrand},
+  journal = {Computational Materials Science},
+  volume  = {68},
+  pages   = {314--319},
+  year    = {2013},
+  url     = {https://doi.org/10.1016/j.commatsci.2012.10.028}
+}
+
+@article{larsen2017ase,
+  title   = {The Atomic Simulation Environment---A Python library for working with atoms},
+  author  = {Larsen, Ask Hjorth and Mortensen, Jens J{\o}rgen and Blomqvist, Jakob and others and Jacobsen, Karsten W.},
+  journal = {Journal of Physics: Condensed Matter},
+  volume  = {29},
+  number  = {27},
+  pages   = {273002},
+  year    = {2017},
+  url     = {https://doi.org/10.1088/1361-648X/aa680e}
+}
+
+@article{giannozzi2009qe,
+  title   = {QUANTUM ESPRESSO: a modular and open-source software project for quantum simulations of materials},
+  author  = {Giannozzi, Paolo and Baroni, Stefano and Bonini, Nicola and others and Wentzcovitch, Renata M.},
+  journal = {Journal of Physics: Condensed Matter},
+  volume  = {21},
+  number  = {39},
+  pages   = {395502},
+  year    = {2009},
+  url     = {https://doi.org/10.1088/0953-8984/21/39/395502}
+}

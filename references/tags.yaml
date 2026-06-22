@@ -1,0 +1,396 @@
+
+# Faceted tag index for the reference corpus.
+# Single source of truth: scripts/extract_paper.py reads this to build the
+# YAML frontmatter prepended to each references/text/<key>.md.
+#
+# Facets:
+#   primary      human-browsing bucket(s)
+#   role         function in this project's pipeline
+#   status       adopted | rejected | candidate | context (+ -lineage / -concept / -cautionary / -template / -baseline qualifiers)
+#   reward_term  which reward signal it informs: topology | superconductivity | stability | composition | multi
+#   domain       ml | physics | chem | software
+#   tags         free-text keywords for grep/RAG matching
+#   one_liner    short description (also used as `summary:` in frontmatter)
+
+papers:
+
+  # ---- generators ----
+  zeni2025mattergen:
+    title: "A generative model for inorganic materials design"
+    year: 2025
+    primary: [generators]
+    role: [generator]
+    status: adopted
+    reward_term: []
+    domain: [ml]
+    tags: [mattergen, diffusion, crystal-generation, policy-backbone, alex-mp-20]
+    one_liner: "Diffusion crystal generator; the pretrained policy backbone this project fine-tunes."
+
+  jiao2023diffcsp:
+    title: "Crystal Structure Prediction by Joint Equivariant Diffusion"
+    year: 2023
+    primary: [generators]
+    role: [generator]
+    status: rejected
+    reward_term: []
+    domain: [ml]
+    tags: [diffcsp, diffusion, equivariant, structure-prediction, rejected-alternative]
+    one_liner: "Joint lattice+coordinate diffusion generator; evaluated and rejected (pins old torch/Python, weak property conditioning)."
+
+  # ---- rl methods & theory ----
+  chen2025matinvent:
+    title: "Accelerating inverse materials design using generative diffusion models with reinforcement learning"
+    year: 2025
+    primary: [rl]
+    role: [rl-algorithm, generator-ft]
+    status: adopted-template
+    reward_term: [multi]
+    domain: [ml]
+    tags: [matinvent, ppo, kl-regularized, diffusion-rl, multi-objective, 378x]
+    one_liner: "The methodological template: RL fine-tuning of a crystal diffusion model with a reward-weighted KL objective."
+
+  schulman2017ppo:
+    title: "Proximal Policy Optimization Algorithms"
+    year: 2017
+    primary: [rl]
+    role: [rl-algorithm]
+    status: candidate
+    reward_term: []
+    domain: [ml]
+    tags: [ppo, policy-gradient, clipped-surrogate, on-policy]
+    one_liner: "PPO; the default policy-optimization choice, treated here as one option among alternatives."
+
+  haarnoja2018sac:
+    title: "Soft Actor-Critic: Off-Policy Maximum Entropy Deep Reinforcement Learning with a Stochastic Actor"
+    year: 2018
+    primary: [rl]
+    role: [rl-algorithm]
+    status: candidate
+    reward_term: []
+    domain: [ml]
+    tags: [sac, off-policy, actor-critic, max-entropy, sample-efficiency]
+    one_liner: "Off-policy actor-critic; alternative when reward evaluations (DFT) are expensive and replay reuse matters."
+
+  bengio2021gflownet:
+    title: "Flow Network based Generative Models for Non-Iterative Diverse Candidate Generation"
+    year: 2021
+    primary: [rl]
+    role: [rl-algorithm]
+    status: candidate
+    reward_term: []
+    domain: [ml]
+    tags: [gflownet, diversity, reward-proportional, mode-coverage]
+    one_liner: "GFlowNets; sample proportional to reward for diverse candidate batches rather than a single optimum."
+
+  black2023ddpo:
+    title: "Training Diffusion Models with Reinforcement Learning"
+    year: 2023
+    primary: [rl]
+    role: [rl-algorithm, diffusion-ft]
+    status: adopted-lineage
+    reward_term: []
+    domain: [ml]
+    tags: [ddpo, denoising-mdp, policy-gradient, diffusion-rl]
+    one_liner: "DDPO; casts denoising as an MDP and applies policy-gradient RL. Direct template for RL-tuning a diffusion generator."
+
+  fan2023dpok:
+    title: "DPOK: Reinforcement Learning for Fine-tuning Text-to-Image Diffusion Models"
+    year: 2023
+    primary: [rl]
+    role: [rl-algorithm, diffusion-ft]
+    status: adopted-lineage
+    reward_term: []
+    domain: [ml]
+    tags: [dpok, kl-regularization, diffusion-rl, reward-maximization]
+    one_liner: "DPOK; KL-regularized reward-maximizing diffusion fine-tuning. Cited by MatInvent for its KL objective."
+
+  olivecrona2017reinvent:
+    title: "Molecular de-novo design through deep reinforcement learning"
+    year: 2017
+    primary: [rl]
+    role: [rl-algorithm, generative-ft]
+    status: lineage
+    reward_term: []
+    domain: [ml]
+    tags: [reinvent, augmented-likelihood, prior-anchoring, molecular-design]
+    one_liner: "REINVENT; prior-anchored RL fine-tuning of a generative model. Conceptual ancestor of MatInvent's KL anchoring."
+
+  roijers2013morl:
+    title: "A Survey of Multi-Objective Sequential Decision-Making"
+    year: 2013
+    primary: [rl]
+    role: [rl-theory]
+    status: context
+    reward_term: [multi]
+    domain: [ml]
+    tags: [multi-objective, scalarization, pareto, chebyshev]
+    one_liner: "MORL survey; framing for combining the four reward terms (weighted sum vs Pareto/Chebyshev)."
+
+  sutton2018rl:
+    title: "Reinforcement Learning: An Introduction (2nd ed.)"
+    year: 2018
+    primary: [rl]
+    role: [rl-theory, root]
+    status: context
+    reward_term: []
+    domain: [ml]
+    tags: [sutton-barto, textbook, foundations, policy-gradient]
+    one_liner: "Canonical RL reference; root anchor for the methods lineage."
+
+  # ---- predictors & potentials (reward models) ----
+  chen2022m3gnet:
+    title: "A universal graph deep learning interatomic potential for the periodic table"
+    year: 2022
+    primary: [predictors]
+    role: [reward-model, potential]
+    status: adopted
+    reward_term: [stability]
+    domain: [ml, software]
+    tags: [m3gnet, matgl, interatomic-potential, formation-energy, convex-hull, relaxation]
+    one_liner: "M3GNet; the fast formation-energy / stability reward and geometry relaxer."
+
+  batatia2022mace:
+    title: "MACE: Higher Order Equivariant Message Passing Neural Networks for Fast and Accurate Force Fields"
+    year: 2022
+    primary: [predictors]
+    role: [potential, reward-candidate]
+    status: candidate
+    reward_term: [topology]
+    domain: [ml]
+    tags: [mace, equivariant, higher-order, mlip, spillage-backbone-candidate]
+    one_liner: "MACE; equivariant MLIP, candidate backbone for the spillage regressor or a higher-fidelity potential."
+
+  choudhary2021alignn:
+    title: "Atomistic Line Graph Neural Network for improved materials property predictions"
+    year: 2021
+    primary: [predictors]
+    role: [reward-model]
+    status: rejected
+    reward_term: [topology]
+    domain: [ml]
+    tags: [alignn, line-graph, dgl, property-prediction, rejected-alternative]
+    one_liner: "ALIGNN; line-graph property predictor, rejected because it needs DGL (no modern torch/Python builds)."
+
+  miksch2021mlsimulations:
+    title: "Strategies for the construction of machine-learning potentials for accurate and efficient atomic-scale simulations"
+    year: 2021
+    primary: [predictors]
+    role: [potential-review]
+    status: context
+    reward_term: []
+    domain: [ml]
+    tags: [mlip, ann-potentials, data-collection, training, tutorial, best-practices]
+    one_liner: "Tutorial review on building ML interatomic potentials; methodology reference for training the spillage regressor."
+
+  choudhary2019spillage:
+    title: "High-throughput Discovery of Topologically Non-trivial Materials using Spin-orbit Spillage"
+    year: 2019
+    primary: [predictors, physics]
+    role: [descriptor, reward-basis]
+    status: adopted-concept
+    reward_term: [topology]
+    domain: [physics]
+    tags: [spillage, band-inversion, jarvis, topology-proxy, high-throughput]
+    one_liner: "Defines spin-orbit spillage as a cheap band-inversion topology proxy; conceptual basis of the topology reward."
+
+  choudhary2021magnetic_spillage:
+    title: "High-throughput search for magnetic topological materials using spin-orbit spillage, machine learning, and experiments"
+    year: 2021
+    primary: [predictors, physics, data]
+    role: [descriptor, ml, data]
+    status: adopted-concept
+    reward_term: [topology]
+    domain: [physics, ml]
+    tags: [spillage, magnetic-topology, lightgbm, cfid, ml-screening, jarvis]
+    one_liner: "Spillage + ML screening of ~40k materials; demonstrates training a spillage/topology classifier on JARVIS labels."
+
+  # ---- quantum-materials physics ----
+  bradlyn2017tqc:
+    title: "Topological quantum chemistry"
+    year: 2017
+    primary: [physics, data]
+    role: [physics-theory, database]
+    status: context-validation
+    reward_term: [topology]
+    domain: [physics]
+    tags: [tqc, band-representations, symmetry, topological-classification]
+    one_liner: "Theoretical framework linking band topology to bonding/symmetry; basis for validating topological candidates."
+
+  zhang2009topological:
+    title: "Topological insulators in Bi2Se3, Bi2Te3 and Sb2Te3 with a single Dirac cone on the surface"
+    year: 2009
+    primary: [physics]
+    role: [physics-theory, synthesis]
+    status: context
+    reward_term: [topology]
+    domain: [physics]
+    tags: [topological-insulator, bi2se3, dirac-cone, mbe, workhorse-materials]
+    one_liner: "Establishes the Bi2Se3 family of 3D topological insulators; the lab-grown workhorse compounds."
+
+  lutchyn2018majorana:
+    title: "Majorana zero modes in superconductor-semiconductor heterostructures"
+    year: 2018
+    primary: [physics, synthesis]
+    role: [synthesis-route]
+    status: context
+    reward_term: [superconductivity]
+    domain: [physics]
+    tags: [majorana, topological-superconductor, mbe, nanowire, proximity-effect, quantum-computing]
+    one_liner: "Review of how Majorana/topological-superconductor platforms are actually grown; reality check on synthesizability."
+
+  # ---- synthesizability & real-world discovery ----
+  cao2025crystalformer:
+    title: "CrystalFormer-RL: Reinforcement Fine-Tuning for Materials Design"
+    year: 2025
+    primary: [generators, rl, synthesis]
+    role: [generator, rl-algorithm]
+    status: candidate-baseline
+    reward_term: [stability]
+    domain: [ml]
+    tags: [crystalformer, rl-fine-tuning, energy-above-hull, conflicting-properties, baseline]
+    one_liner: "Closest published analogue: RL fine-tuning of a crystal generator with stability + property rewards. Use as baseline."
+
+  jang2020synthesizability:
+    title: "Structure-Based Synthesizability Prediction of Crystals Using Partially Supervised Learning"
+    year: 2020
+    primary: [synthesis, predictors]
+    role: [reward-candidate]
+    status: candidate
+    reward_term: [stability]
+    domain: [ml]
+    tags: [synthesizability, clscore, positive-unlabeled, cgcnn, beyond-hull]
+    one_liner: "Learned crystal-likeness score (CLscore) via PU learning; candidate synthesizability reward beyond energy-above-hull."
+
+  aykol2018thermolimit:
+    title: "Thermodynamic limit for synthesis of metastable inorganic materials"
+    year: 2018
+    primary: [synthesis]
+    role: [discovery-theory]
+    status: context
+    reward_term: [stability]
+    domain: [chem, physics]
+    tags: [amorphous-limit, metastability, synthesizability-ceiling, convex-hull]
+    one_liner: "Defines the amorphous limit as a thermodynamic ceiling on metastable synthesis; justifies the stability reward."
+
+  bartel2022stability:
+    title: "Review of computational approaches to predict the thermodynamic stability of inorganic solids"
+    year: 2022
+    primary: [synthesis]
+    role: [review]
+    status: context
+    reward_term: [stability]
+    domain: [chem]
+    tags: [stability, energy-above-hull, decomposition, synthesizability-proxy, review]
+    one_liner: "Systematizes DFT stability; warns that thermodynamic stability is an imperfect synthesizability proxy."
+
+  merchant2023gnome:
+    title: "Scaling deep learning for materials discovery"
+    year: 2023
+    primary: [synthesis]
+    role: [ai-discovery]
+    status: context
+    reward_term: [stability]
+    domain: [ml]
+    tags: [gnome, gnn, substitution, 381000-structures, stability-prediction]
+    one_liner: "GNoME; ~381k claimed newly-stable structures via GNN stability + substitution. Central AI-discovery reference."
+
+  szymanski2023alab:
+    title: "An autonomous laboratory for the accelerated synthesis of inorganic materials"
+    year: 2023
+    primary: [synthesis]
+    role: [autonomous-synthesis]
+    status: context
+    reward_term: []
+    domain: [chem, ml]
+    tags: [a-lab, autonomous-synthesis, robotics, gnome-targets, active-learning, correction-2026]
+    one_liner: "A-Lab; robotic synthesis of GNoME-derived targets. Note the Jan 2026 Nature correction walking back novelty claims."
+
+  cheetham2024gnom_critique:
+    title: "Artificial Intelligence Driving Materials Discovery? Perspective on Scaling Deep Learning for Materials Discovery"
+    year: 2024
+    primary: [synthesis]
+    role: [critique]
+    status: context-cautionary
+    reward_term: []
+    domain: [chem, ml]
+    tags: [gnome-critique, novelty, credibility, superstructures, valence-violations]
+    one_liner: "Critique of GNoME novelty/credibility; many entries are trivial superstructures or implausible compositions."
+
+  leeman2024challenges:
+    title: "Challenges in High-Throughput Inorganic Materials Prediction and Autonomous Synthesis"
+    year: 2024
+    primary: [synthesis]
+    role: [critique]
+    status: context-cautionary
+    reward_term: []
+    domain: [chem, ml]
+    tags: [a-lab-critique, compositional-disorder, xrd-refinement, no-new-materials]
+    one_liner: "Critique of A-Lab: automated XRD imposed false ordering on disordered phases; no genuinely new materials demonstrated."
+
+  cheetham2025digitalage:
+    title: "Discovery of Crystalline Inorganic Solids in the Digital Age"
+    year: 2025
+    primary: [synthesis]
+    role: [discovery-provenance]
+    status: context
+    reward_term: []
+    domain: [chem]
+    tags: [provenance, compositional-vs-structural-novelty, icsd, candidates-not-discoveries]
+    one_liner: "Provenance of new inorganic compounds; computational predictions are candidates, not discoveries."
+
+  # ---- data sources ----
+  choudhary2020jarvis:
+    title: "The joint automated repository for various integrated simulations (JARVIS) for data-driven materials design"
+    year: 2020
+    primary: [data]
+    role: [data-source]
+    status: adopted
+    reward_term: [topology]
+    domain: [software]
+    tags: [jarvis, jarvis-dft, spillage-labels, topological-subset, database]
+    one_liner: "JARVIS-DFT; source of the spillage labels and topological subset the topology regressor trains on."
+
+  jain2013materialsproject:
+    title: "Commentary: The Materials Project: A materials genome approach to accelerating materials innovation"
+    year: 2013
+    primary: [data]
+    role: [data-source]
+    status: adopted
+    reward_term: [stability]
+    domain: [software]
+    tags: [materials-project, convex-hull, dft-database, mp-api]
+    one_liner: "Materials Project; the convex-hull / stability reference and a MatterGen training source."
+
+  # ---- simulation & dft tooling ----
+  ong2013pymatgen:
+    title: "Python Materials Genomics (pymatgen): A robust, open-source python library for materials analysis"
+    year: 2013
+    primary: [tooling]
+    role: [validation-tool]
+    status: adopted
+    reward_term: []
+    domain: [software]
+    tags: [pymatgen, structure-io, phase-diagram, vasp-io, convex-hull]
+    one_liner: "pymatgen; structure handling, phase-diagram/hull analysis, and DFT I/O glue."
+
+  larsen2017ase:
+    title: "The Atomic Simulation Environment - A Python library for working with atoms"
+    year: 2017
+    primary: [tooling]
+    role: [validation-tool]
+    status: adopted
+    reward_term: []
+    domain: [software]
+    tags: [ase, calculators, relaxation, job-orchestration]
+    one_liner: "ASE; uniform calculator interface driving MLIP relaxations and DFT orchestration."
+
+  giannozzi2009qe:
+    title: "QUANTUM ESPRESSO: a modular and open-source software project for quantum simulations of materials"
+    year: 2009
+    primary: [tooling]
+    role: [validation-tool]
+    status: adopted
+    reward_term: []
+    domain: [software]
+    tags: [quantum-espresso, dft, dfpt, phonons, dynamical-stability]
+    one_liner: "Quantum ESPRESSO; phonon / dynamical-stability calculations on top candidates."
