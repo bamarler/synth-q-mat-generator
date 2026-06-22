@@ -19,7 +19,7 @@ jobs:
       # Lint without resolving the full (CUDA/materials) dependency tree —
       # ruff is the only thing this job needs.
       - name: Ruff lint
-        run: uvx ruff@0.4.0 check src/ tests/ scripts/
+        run: uvx ruff@0.15.16 check src/ tests/ scripts/
 
       - name: Ruff format check
-        run: uvx ruff@0.4.0 format --check src/ tests/ scripts/
+        run: uvx ruff@0.15.16 format --check src/ tests/ scripts/
