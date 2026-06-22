@@ -1,4 +1,15 @@
 stages:
+  hull-cache:
+    cmd: SQMG_DVC=1 python -m synth_q_mat.data.hull_cache
+    deps:
+      - src/synth_q_mat/data/hull_cache.py
+      - src/synth_q_mat/config.py
+      - data/raw/mp_summary.parquet
+    params:
+      - composition
+    outs:
+      - data/processed/hull_eform.parquet
+
   baseline:
     cmd: SQMG_DVC=1 python -m synth_q_mat.eval.baseline
     deps:
