@@ -16,7 +16,7 @@ stages:
     cmd: SQMG_DVC=1 python -m synth_q_mat.rl.train
     deps:
       - src/synth_q_mat/rl/train.py
-      - src/synth_q_mat/rl/reward.py
+      - src/synth_q_mat/rl/reward
       - src/synth_q_mat/config.py
     params:
       - seed

@@ -34,24 +34,3 @@ class RewardWeights:
         if total <= 0:
             raise ValueError("Reward weights must sum to a positive value")
         return raw / total
-
-
-def formation_to_score(e_above_hull: float, cutoff: float = 0.10) -> float:
-    """Map formation energy above hull (eV/atom) to a [0, 1] stability score.
-
-    On-hull (<=0) scores 1.0; at the synthesizability cutoff it scores 0.0.
-    """
-    if e_above_hull <= 0:
-        return 1.0
-    return float(np.clip(1.0 - e_above_hull / cutoff, 0.0, 1.0))
-
-
-def compute_reward(
-    objectives: dict[str, float],
-    weights: RewardWeights,
-) -> float:
-    """Weighted sum of the four objective scores (each must be in [0, 1]; missing -> 0.0)."""
-    values = np.array([objectives.get(name, 0.0) for name in OBJECTIVES], dtype=float)
-    if np.any((values < 0.0) | (values > 1.0)):
-        raise ValueError(f"Objective scores must be in [0, 1], got {objectives}")
-    return float(values @ weights.as_array())
