@@ -25,7 +25,9 @@ models:
   stability: m3gnet
   evaluator: energy_above_hull
 generate:
-  pretrained_name: mattergen_base
+  pretrained_name: chemical_system
+  guidance_factor: 2.0
+  elements_per_system: [2, 3]
   batch_size: 4
   num_batches: 1
   relax: false

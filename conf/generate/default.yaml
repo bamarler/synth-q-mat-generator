@@ -1,5 +1,10 @@
-# Structure generation (MatterGen base, isolated venv).
-pretrained_name: mattergen_base
+# Structure generation. The chemical_system conditional MatterGen model is
+# conditioned per batch on a sampled light-element chemical system (Z range from
+# `composition`), so output is light-only and sweeps the whole light space.
+# Swap generators via `models.generator` (build_generator factory).
+pretrained_name: chemical_system
+guidance_factor: 2.0           # diffusion guidance strength for conditioning
+elements_per_system: [2, 3]    # sample this many distinct light elements per system
 batch_size: 4
 num_batches: 1
 relax: false   # score on as-given geometry; candidate and hull on equal footing

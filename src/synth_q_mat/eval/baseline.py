@@ -10,9 +10,30 @@ import numpy as np
 
 from synth_q_mat.config import load_config
 from synth_q_mat.models.evaluator import build_evaluator
-from synth_q_mat.models.generator import MatterGenGenerator
+from synth_q_mat.models.generator import Generator, build_generator
 from synth_q_mat.rl.reward import RewardWeights, compute_reward, formation_to_score
-from synth_q_mat.rl.reward.composition import within_z_range
+from synth_q_mat.rl.reward.composition import sample_light_chemsys, within_z_range
+
+
+def _generate(
+    generator: Generator, gen_cfg: dict[str, Any], comp: dict[str, Any], seed: int
+) -> tuple[list, list]:
+    """A batch per call; the conditional model is steered to a sampled light system."""
+    bs, nb = gen_cfg["batch_size"], gen_cfg["num_batches"]
+    if gen_cfg["pretrained_name"] == "mattergen_base":  # unconditional
+        structures = generator.generate(bs, nb)
+        return structures, [None] * len(structures)
+    rng = np.random.default_rng(seed)
+    k_lo, k_hi = gen_cfg["elements_per_system"]
+    structures, chemsys = [], []
+    for _ in range(nb):
+        cs = sample_light_chemsys(
+            rng, comp["min_z"], comp["max_z"], int(rng.integers(k_lo, k_hi + 1))
+        )
+        batch = generator.generate(bs, 1, chemical_system=cs)
+        structures += batch
+        chemsys += [cs] * len(batch)
+    return structures, chemsys
 
 
 def _flatten(d: dict[str, Any], prefix: str = "") -> dict[str, Any]:
@@ -32,9 +53,9 @@ def main(argv: list[str] | None = None) -> int:
     weights = RewardWeights.from_config(rcfg)
     cutoff = rcfg["formation_energy_cutoff"]
 
-    generator = MatterGenGenerator.from_config(cfg)
+    generator = build_generator(cfg)
     evaluator = build_evaluator(cfg)
-    structures = generator.generate(gen_cfg["batch_size"], gen_cfg["num_batches"])
+    structures, chemsys = _generate(generator, gen_cfg, comp, cfg["seed"])
 
     # Light-element hard gate: heavy-element structures get the floor reward (0)
     # and are not scored. MatterGen base has no element constraint; a true hard
@@ -48,7 +69,7 @@ def main(argv: list[str] | None = None) -> int:
             ehull[i] = e
 
     candidates = []
-    for s, ok, e in zip(structures, light, ehull, strict=True):
+    for s, ok, e, cs in zip(structures, light, ehull, chemsys, strict=True):
         if ok:
             s_stab = formation_to_score(float(e), cutoff)
             reward = compute_reward({evaluator.objective: s_stab}, weights)
@@ -58,6 +79,7 @@ def main(argv: list[str] | None = None) -> int:
             {
                 "formula": s.composition.reduced_formula,
                 "n_atoms": len(s),
+                "chemsys": cs,
                 "light": ok,
                 "e_above_hull": None if np.isnan(e) else float(e),
                 "s_stab": s_stab,
