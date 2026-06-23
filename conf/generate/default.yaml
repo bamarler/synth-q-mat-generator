@@ -1,0 +1,5 @@
+# Structure generation (MatterGen base, isolated venv).
+pretrained_name: mattergen_base
+batch_size: 4
+num_batches: 1
+relax: false   # score on as-given geometry; candidate and hull on equal footing

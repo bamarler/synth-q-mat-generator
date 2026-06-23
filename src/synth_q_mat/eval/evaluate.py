@@ -10,18 +10,27 @@ from synth_q_mat.config import load_config
 def main(argv: list[str] | None = None) -> int:
     cfg = load_config(overrides=argv if argv is not None else sys.argv[1:])
     results = Path(cfg["paths"]["results"])
-    print("[evaluate] config loaded")
-    print(f"[evaluate] checkpoints: {cfg['paths']['checkpoints']}")
-    print(f"[evaluate] results    : {results}")
-    print("[evaluate] TODO: rank candidates, compute Pareto front (weeks 5, 9)")
+    candidates = json.loads((results / "candidates.json").read_text())
 
-    results.mkdir(parents=True, exist_ok=True)
-    (results / "candidates.json").write_text(
-        json.dumps({"candidates": [], "placeholder": True}) + "\n"
-    )
+    ranked = sorted(candidates, key=lambda c: c["reward"], reverse=True)
+    top = ranked[:10]
     metric = results / "metrics" / "eval.json"
     metric.parent.mkdir(parents=True, exist_ok=True)
-    metric.write_text(json.dumps({"stage": "eval", "placeholder": True}) + "\n")
+    metric.write_text(
+        json.dumps(
+            {
+                "stage": "eval",
+                "n": len(candidates),
+                "best_reward": top[0]["reward"] if top else 0.0,
+                "top": [{"formula": c["formula"], "reward": c["reward"]} for c in top],
+            }
+        )
+        + "\n"
+    )
+    print(
+        f"[evaluate] ranked {len(candidates)}; best reward "
+        f"{top[0]['reward'] if top else 0.0:.3f}"
+    )
     return 0
 
 

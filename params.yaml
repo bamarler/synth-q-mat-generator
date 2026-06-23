@@ -23,6 +23,12 @@ models:
   generator: mattergen
   topology: spillage_gnn
   stability: m3gnet
+  evaluator: energy_above_hull
+generate:
+  pretrained_name: mattergen_base
+  batch_size: 4
+  num_batches: 1
+  relax: false
 seed: 42
 paths:
   data_raw: data/raw

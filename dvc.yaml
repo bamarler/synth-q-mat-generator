@@ -14,11 +14,20 @@ stages:
     cmd: SQMG_DVC=1 python -m synth_q_mat.eval.baseline
     deps:
       - src/synth_q_mat/eval/baseline.py
+      - src/synth_q_mat/models/generator.py
+      - src/synth_q_mat/models/stability.py
+      - src/synth_q_mat/models/evaluator.py
+      - src/synth_q_mat/rl/reward
       - src/synth_q_mat/config.py
+      - data/processed/hull_eform.parquet
     params:
       - seed
+      - reward
+      - generate
       - composition
       - models
+    outs:
+      - results/candidates.json
     metrics:
       - results/metrics/baseline.json:
           cache: false
@@ -47,12 +56,10 @@ stages:
     deps:
       - src/synth_q_mat/eval/evaluate.py
       - src/synth_q_mat/config.py
-      - models/checkpoints
+      - results/candidates.json
     params:
       - seed
       - reward
-    outs:
-      - results/candidates.json
     metrics:
       - results/metrics/eval.json:
           cache: false

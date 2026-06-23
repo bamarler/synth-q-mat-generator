@@ -1,0 +1,6 @@
+# Single-objective warmup: stability (energy above hull) only.
+w_topology: 0.0
+w_dos_fermi: 0.0
+w_formation: 1.0
+w_composition: 0.0
+formation_energy_cutoff: 0.10   # eV/atom above hull considered synthesizable
